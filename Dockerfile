@@ -47,17 +47,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-transport-https \
     ca-certificates \
     gnupg \
-    \
-    # --- Cleanup before adding new repository ---
-    && rm -rf /var/lib/apt/lists/* \
-    \
-    # --- Add Google Cloud SDK repository and install gcloud-cli ---
-    && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
-    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg \
-    && apt-get update && apt-get install -y google-cloud-cli \
-    \
-    # --- Final Cleanup ---
+    lsb-release \
     && rm -rf /var/lib/apt/lists/*
+
+# -----------------------------------------------------------------------------
+# STEP 3.5: INSTALL GOOGLE CLOUD CLI (FIXED VERSION)
+# -----------------------------------------------------------------------------
+# Use the official Google Cloud CLI installation script
+RUN curl https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=/opt
+ENV PATH="/opt/google-cloud-sdk/bin:${PATH}"
+
+# Verify Google Cloud CLI installation
+RUN gcloud --version
 
 # -----------------------------------------------------------------------------
 # STEP 4: INSTALL PYTHON DEPENDENCIES
